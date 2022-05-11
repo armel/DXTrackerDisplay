@@ -71,95 +71,13 @@ void updateLocalTime()
   dateString = String(timeStringBuff);
 }
 
-/*
 // Build scroll A
 void buildScrollA()
 {
   int16_t h = 40;
   int16_t w;
 
-  imgA.setFont(&Rounded_Elegance20pt7b); 
-  w = imgA.textWidth(messageA) + 80;
-  // We could just use fillSprite(color) but lets be a bit more creative...
-  while (h--)
-    imgA.drawFastHLine(0, h, w, TFT_BLUE);
-
-  // Now print text on top of the graphics
-  imgA.setTextColor(TFT_WHITE); // White text, no background colour
-  //imgA.setTextWrap(false);      // Turn of wrap so we can print past end of sprite
-
-  // Need to print twice so text appears to wrap around at left and right edges
-  imgA.drawString(messageA, posA, 2);
-  imgA.drawString(messageA, posA - w, 2);
-}
-
-// Scroll A
-void scrollA(uint8_t pause)
-{
-  // Sprite for scroll
-  buildScrollA();
-  imgA.pushSprite(0, 160);
-
-  posA -= 1;
-  if (posA == 0)
-  {
-    //posA = display.width();
-    imgA.setFont(&Rounded_Elegance20pt7b); 
-    posA = imgA.textWidth(messageA) + 80;
-  }
-
-  vTaskDelay(pdMS_TO_TICKS(pause));
-}
-
-// Build scroll B
-void buildScrollB()
-{
-  int16_t h = 20;
-  int16_t w;
-
-  imgB.setTextSize(1);          // Font size scaling is x1
-  imgB.setTextFont(2);          // Font 2 selected
-  w = imgB.textWidth(messageB) + 80;
-  // We could just use fillSprite(color) but lets be a bit more creative...
-  while (h--)
-    imgB.drawFastHLine(0, h, w, TFT_RED);
-
-  // Now print text on top of the graphics
-  imgB.setTextColor(M5.Lcd.color565(TFT_GRAY.r, TFT_GRAY.g, TFT_GRAY.b)); // Gray text, no background colour
-  imgB.setTextWrap(false);      // Turn of wrap so we can print past end of sprite
-
-  // Need to print twice so text appears to wrap around at left and right edges
-  imgB.drawString(messageB, posB, 2);
-  imgB.drawString(messageB, posB - w, 2);
-}
-
-// Scroll B
-void scrollB(uint8_t pause)
-{
-  // Sprite for scroll
-  buildScrollB();
-  imgB.pushSprite(0, 250);
-
-  posB -= 1;
-  if (posB == 0)
-  {
-    //posB = M5.Lcd.width();
-    imgB.setTextSize(1);          // Font size scaling is x1
-    imgB.setTextFont(2);          // Font 2 selected
-    posB = imgB.textWidth(messageB) + 80;
-  }
-
-  vTaskDelay(pdMS_TO_TICKS(pause));
-}
-*/
-
-// Build scroll A
-void buildScrollA()
-{
-  int16_t h = 30;
-  int16_t w;
-
-  imgA.setFont(&Rounded_Elegance14pt7b); 
+  imgA.setFont(&Rounded_Elegance20pt7b);
   w = imgA.textWidth(messageA) + 80;
   // We could just use fillSprite(color) but lets be a bit more creative...
   while (h--)
@@ -179,13 +97,13 @@ void scrollA(uint8_t pause)
 {
   // Sprite for scroll
   buildScrollA();
-  imgA.pushSprite(0, 180);
+  imgA.pushSprite(24, 170);
 
   posA -= 2;
   if (posA < 0)
   {
     //posA = M5.Lcd.width();
-    imgA.setFont(&Rounded_Elegance14pt7b); 
+    imgA.setFont(&Rounded_Elegance20pt7b);
     posA = imgA.textWidth(messageA) + 80;
   }
 
@@ -195,7 +113,7 @@ void scrollA(uint8_t pause)
 // Build scroll B
 void buildScrollB()
 {
-  int16_t h = 30;
+  int16_t h = 28;
   int16_t w;
 
   imgB.setFont(&Rounded_Elegance14pt7b); 
@@ -218,7 +136,7 @@ void scrollB(uint8_t pause)
 {
   // Sprite for scroll
   buildScrollB();
-  imgB.pushSprite(0, 240);
+  imgB.pushSprite(24, 240);
 
   posB -= 2;
   if (posB < 0)
@@ -287,21 +205,21 @@ void title(String title)
     reloadStateOld = tmpString;
 
     if(tmpString != "") {
-      display.drawFastHLine(2, 35, 10, display.color565(TFT_GRAY.r, TFT_GRAY.g, TFT_GRAY.b));
-      display.drawLine(12, 35, 8, 31, display.color565(TFT_GRAY.r, TFT_GRAY.g, TFT_GRAY.b));
-      display.drawLine(12, 35, 8, 39, display.color565(TFT_GRAY.r, TFT_GRAY.g, TFT_GRAY.b));
+      display.drawFastHLine(2, 120, 10, display.color565(TFT_GRAY.r, TFT_GRAY.g, TFT_GRAY.b));
+      display.drawLine(12, 120, 8, 116, display.color565(TFT_GRAY.r, TFT_GRAY.g, TFT_GRAY.b));
+      display.drawLine(12, 120, 8, 124, display.color565(TFT_GRAY.r, TFT_GRAY.g, TFT_GRAY.b));
     }
     else {
-      display.drawFastHLine(2, 35, 10, display.color565(TFT_BACK.r, TFT_BACK.g, TFT_BACK.b));
-      display.drawLine(12, 35, 8, 31, display.color565(TFT_BACK.r, TFT_BACK.g, TFT_BACK.b));
-      display.drawLine(12, 35, 8, 39, display.color565(TFT_BACK.r, TFT_BACK.g, TFT_BACK.b));
+      display.drawFastHLine(2, 120, 10, display.color565(TFT_BACK.r, TFT_BACK.g, TFT_BACK.b));
+      display.drawLine(12, 120, 8, 116, display.color565(TFT_BACK.r, TFT_BACK.g, TFT_BACK.b));
+      display.drawLine(12, 120, 8, 124, display.color565(TFT_BACK.r, TFT_BACK.g, TFT_BACK.b));
     }
 
     display.setTextColor(display.color565(TFT_GRAY.r, TFT_GRAY.g, TFT_GRAY.b), display.color565(TFT_BACK.r, TFT_BACK.g, TFT_BACK.b));
-    display.setFont(0);
+    display.setFont(&Rounded_Elegance14pt7b);
     display.setTextDatum(ML_DATUM);
-    display.setTextPadding(50);
-    display.drawString(tmpString, 18, 36);
+    display.setTextPadding(120);
+    display.drawString(tmpString, 18, 120);
   }
 }
 
@@ -498,8 +416,8 @@ void scroll()
 
   for(uint16_t i = 0; i < 10; i += 1)
   {
-    scrollA(5);
-    scrollB(5);
+    scrollA(0);
+    scrollB(0);
   }
 }
 

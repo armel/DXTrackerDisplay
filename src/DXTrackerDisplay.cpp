@@ -105,14 +105,13 @@ void setup()
   updateLocalTime();
 
   // Scroll
-  posA = display.width();
-  imgA.createSprite(posA, 30);
+  posA = display.width() - 48;
+  imgA.createSprite(posA, 40);
 
-  posB = display.width();
-  imgB.createSprite(posB, 30);
+  posB = display.width() - 48;
+  imgB.createSprite(posB, 28);
 
-  // Start server (for Web site Screen Capture)
-  httpServer.begin();     
+  delay(500);
 
   // Clear screen
   for (uint16_t i = 0; i <= (HEIGHT / 2); i++)
@@ -265,9 +264,4 @@ void loop()
     alternance++;
     alternance = (alternance > 11) ? 0 : alternance;
   }
-
-  Serial.println(messageA);
-  Serial.println(posA);
-  Serial.println(messageB);
-  Serial.println(posB);
 }
