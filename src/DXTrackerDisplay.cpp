@@ -265,4 +265,9 @@ void loop()
     alternance++;
     alternance = (alternance > 11) ? 0 : alternance;
   }
+
+  Serial.println(messageA);
+  Serial.println(posA);
+  Serial.println(messageB);
+  Serial.println(posB);
 }

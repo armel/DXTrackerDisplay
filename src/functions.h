@@ -182,7 +182,7 @@ void scrollA(uint8_t pause)
   imgA.pushSprite(0, 180);
 
   posA -= 2;
-  if (posA == 0)
+  if (posA < 0)
   {
     //posA = M5.Lcd.width();
     imgA.setFont(&Rounded_Elegance14pt7b); 
@@ -221,7 +221,7 @@ void scrollB(uint8_t pause)
   imgB.pushSprite(0, 240);
 
   posB -= 2;
-  if (posB == 0)
+  if (posB < 0)
   {
     //posB = M5.Lcd.width();
     imgB.setFont(&Rounded_Elegance14pt7b); 
