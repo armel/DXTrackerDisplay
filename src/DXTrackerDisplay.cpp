@@ -119,7 +119,7 @@ void setup()
   {
     display.drawFastHLine(0, i, WIDTH, TFT_BLACK);
     display.drawFastHLine(0, HEIGHT - i, WIDTH, TFT_BLACK);
-    delay(5);
+    delay(2);
   }
 
   // Select map
@@ -223,11 +223,12 @@ void setup()
   
   delay(500);
 
-  for (uint8_t i = 0; i <= 120; i++)
+  // Clear screen
+  for (uint16_t i = 0; i <= (HEIGHT / 2); i++)
   {
-    display.drawFastHLine(0, i, 320, TFT_BLACK);
-    display.drawFastHLine(0, 240 - i, 320, TFT_BLACK);
-    delay(5);
+    display.drawFastHLine(0, i, WIDTH, TFT_BLACK);
+    display.drawFastHLine(0, HEIGHT - i, WIDTH, TFT_BLACK);
+    delay(2);
   }
 
   // And clear
