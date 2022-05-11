@@ -4,10 +4,8 @@
 // Config
 
 const char *config[] = {
-    "F1ZPX", "petitchaton", "48.8482855", "2.2708201",
-    "F4HWN", "petitchaton", "48.8482855", "2.2708201"
+    "WIFI_SSID", "WIFI_PASSWORD", "LATITUDE", "LONGITUDE"
 };
-
 
 /*
 Note that it's possible to configure many configurations, like this
