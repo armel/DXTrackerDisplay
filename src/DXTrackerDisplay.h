@@ -37,17 +37,6 @@ int scrollstep = 1;
 // Wifi
 WiFiClient clientHamQSL, clientSat, clientGreyline, clientHamQTH;
 WiFiClient httpClient;
-WiFiServer httpServer(80);
-
-// Web site Screen Capture stuff
-#define GET_unknown 0
-#define GET_index_page  1
-#define GET_screenshot  2
-
-// Flags for button presses via Web site Screen Capture
-bool buttonLeftPressed = false;
-bool buttonCenterPressed = false;
-bool buttonRightPressed = false;
 
 // Preferences
 Preferences preferences;
