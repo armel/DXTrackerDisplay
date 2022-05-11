@@ -105,10 +105,10 @@ void setup()
   updateLocalTime();
 
   // Scroll
-  posA = display.width() - 48;
+  posA = display.width() - 98;
   imgA.createSprite(posA, 40);
 
-  posB = display.width() - 48;
+  posB = display.width() - 98;
   imgB.createSprite(posB, 28);
 
   delay(500);

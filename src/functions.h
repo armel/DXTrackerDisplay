@@ -97,7 +97,7 @@ void scrollA(uint8_t pause)
 {
   // Sprite for scroll
   buildScrollA();
-  imgA.pushSprite(24, 170);
+  imgA.pushSprite(48, 170);
 
   posA -= 2;
   if (posA < 0)
@@ -136,7 +136,7 @@ void scrollB(uint8_t pause)
 {
   // Sprite for scroll
   buildScrollB();
-  imgB.pushSprite(24, 240);
+  imgB.pushSprite(48, 240);
 
   posB -= 2;
   if (posB < 0)

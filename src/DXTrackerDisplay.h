@@ -141,7 +141,6 @@ boolean greylineRefresh = 0;
 boolean greylineSelect = 0;
 
 uint8_t screenRefresh = 1;
-uint8_t htmlGetRequest;
 uint8_t alternance = 0;
 uint8_t configCurrent = 0;
 uint8_t brightnessCurrent = 64;
