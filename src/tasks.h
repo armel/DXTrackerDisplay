@@ -246,15 +246,6 @@ void hamdata(void *pvParameters)
       // Pause
       wait = millis() - timer;
 
-      /*
-      if (wait < limit) {
-        Serial.println(limit - wait);
-      }
-      else {
-        Serial.println(0);
-      }
-      */
-
       Serial.println("----------");
      
       if (wait < limit)

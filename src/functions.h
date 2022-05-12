@@ -99,7 +99,7 @@ void scrollA(uint8_t pause)
   buildScrollA();
   imgA.pushSprite(48, 170);
 
-  posA -= 2;
+  posA -= 3;
   if (posA < 0)
   {
     //posA = M5.Lcd.width();
@@ -399,7 +399,6 @@ void greyline()
     // Draw greyline
     decoded = JpegDec.decodeFsFile("/greyline.jpg");
     if (decoded) {
-      //display.drawJpgFile(SPIFFS, "/greyline.jpg", 0, 101, 320, 139, 0, 11);
       display.drawJpgFile(SPIFFS, "/greyline.jpg", 0, 290, 1024, 512, 0, 34);
       greylineRefresh = 0;
     }
@@ -426,26 +425,10 @@ void wakeAndSleep()
 {
   if (screensaverMode == 0 && millis() - screensaver > TIMEOUT_SCREENSAVER)
   {
-    for (uint8_t i = brightnessCurrent; i >= 1; i--)
-    {
-      setBrightness(i);
-      scrollA(0);
-      scrollB(0);
-      delay(10);
-    }
     screensaverMode = 1;
-    display.sleep();
   }
   else if (screensaverMode == 1 && millis() - screensaver < TIMEOUT_SCREENSAVER)
   {
-    display.wakeup();
     screensaverMode = 0;
-    for (uint8_t i = 1; i <= brightnessCurrent; i++)
-    {
-      setBrightness(i);
-      scrollA(0);
-      scrollB(0);
-      delay(10);
-    }
   }
 }

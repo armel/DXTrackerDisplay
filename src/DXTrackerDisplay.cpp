@@ -39,7 +39,6 @@ void setup()
   }
 
   // LCD
-  display.setBrightness(brightnessCurrent);
   display.fillScreen(display.color565(TFT_BACK.r, TFT_BACK.g, TFT_BACK.b));
   screensaver = millis(); // Screensaver update !!!
 
@@ -160,9 +159,6 @@ void setup()
     preferences.putUInt("map", greylineSelect);
   }
 
-  //Serial.println(greylineSelect);
-  //Serial.println(endpointGreyline[greylineSelect]);
-
   // Multitasking task for retreive propag data
   xTaskCreatePinnedToCore(
       hamdata,        // Function to implement the task
@@ -264,4 +260,12 @@ void loop()
     alternance++;
     alternance = (alternance > 11) ? 0 : alternance;
   }
+
+  /*
+  Serial.print(millis() - screensaver);
+  Serial.print(" - ");
+  Serial.print(screensaverMode);
+  Serial.print(" - ");
+  Serial.println(TIMEOUT_TEMPORISATION);
+  */
 }

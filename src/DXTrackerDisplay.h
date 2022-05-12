@@ -5,7 +5,7 @@
 #define AUTHOR "F4HWN"
 #define NAME "DXTrackerDisplay"
 
-#define TIMEOUT_SCREENSAVER   5 * 60 * 1000   // 5 min
+#define TIMEOUT_SCREENSAVER   1 * 10 * 1000   // 5 min
 #define TIMEOUT_MAP           5 * 1000        // 5 sec
 #define TIMEOUT_TEMPORISATION 10 * 1000       // 10 sec
 
@@ -36,7 +36,6 @@ int scrollstep = 1;
 
 // Wifi
 WiFiClient clientHamQSL, clientSat, clientGreyline, clientHamQTH;
-WiFiClient httpClient;
 
 // Preferences
 Preferences preferences;
@@ -143,7 +142,6 @@ boolean greylineSelect = 0;
 uint8_t screenRefresh = 1;
 uint8_t alternance = 0;
 uint8_t configCurrent = 0;
-uint8_t brightnessCurrent = 64;
 uint8_t messageCurrent = 0;
 
 int16_t parenthesisBegin = 0;
@@ -161,6 +159,3 @@ uint32_t frequencyExclude[] = {
   50310, 50313, 50328, 50323,
   70100, 144174, 222065, 432065
 };
-
-#undef SPI_READ_FREQUENCY
-#define SPI_READ_FREQUENCY 40000000

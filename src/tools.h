@@ -3,18 +3,6 @@
 
 int btnA, btnL;
 
-// Get Battery level
-int8_t getBatteryLevel(bool type)
-{
-  return M5.Power.getBatteryLevel();
-}
-
-// Control if charging
-bool isCharging()
-{
-  return M5.Power.isCharging();
-}
-
 // Get button
 void getButton()
 {
@@ -25,12 +13,6 @@ void getButton()
 
   //Serial.print(btnA);
   //Serial.println(btnL);
-}
-
-// Manage brightness
-void setBrightness(uint8_t value)
-{
-  display.setBrightness(value);
 }
 
 // Shutdown
