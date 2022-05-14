@@ -79,6 +79,7 @@ void buildScrollA()
 
   imgA.setFont(&Rounded_Elegance20pt7b);
   w = imgA.textWidth(messageA) + 80;
+  
   // We could just use fillSprite(color) but lets be a bit more creative...
   while (h--)
     imgA.drawFastHLine(0, h, w, TFT_BLACK);
@@ -331,7 +332,7 @@ void clusterAndSatMessage()
     messageA = "";
     hamQTHData.replace("\n", "|");
 
-    for (uint8_t i = 0; i < 50; i++)
+    for (uint8_t i = 0; i < 30; i++)
     {
       cluster[i] = getValue(hamQTHData, '|', i);
       frequency[i] = getValue(cluster[i], '^', 1);

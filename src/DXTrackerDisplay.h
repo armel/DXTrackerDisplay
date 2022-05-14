@@ -1,7 +1,7 @@
 // Copyright (c) F4HWN Armel. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#define VERSION "0.0.1"
+#define VERSION "0.0.2"
 #define AUTHOR "F4HWN"
 #define NAME "DXTrackerDisplay"
 
@@ -120,7 +120,7 @@ String propagKey[] = {
   "12m-10m\" time=\"night\">"    
 };
 
-String cluster[50], call[50], frequency[50], band[50], country[50];
+String cluster[30], call[30], frequency[30], band[30], country[30];
 
 // Task Handle
 TaskHandle_t hamdataHandle;
