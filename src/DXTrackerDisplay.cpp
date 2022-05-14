@@ -46,7 +46,8 @@ void setup()
   if(!SPIFFS.begin())
   {
     Serial.println("SPIFFS Mount Failed");
-    return;
+    Serial.println("SPIFFS Formating...");
+    SPIFFS.format(); // Format SPIFFS...
   }
 
   // Title
