@@ -11,7 +11,7 @@
 
 **Many thanks to them and all my [donors](#donations)🙏🏻** 
 
-The DXTracker Display project is a special version of the [DXTracker](https://github.com/armel/DXTracker) for M5Stack. It runs on ATOM Lite and ATOM Echo Smart, with the [LCD Display Driver Kit](https://shop.m5stack.com/products/m5stack-atom-lite-lcd-display-driver-kit). You need an 1024 x 768 display with HDMI connector.
+The DXTracker Display project is a special version of the [DXTracker](https://github.com/armel/DXTracker) for M5Stack. It runs on ATOM Lite, ATOM Echo Smart and ATOM Matrix, with the [LCD Display Driver Kit](https://shop.m5stack.com/products/m5stack-atom-lite-lcd-display-driver-kit). You need an 1024 x 768 display with HDMI connector.
 
 # Donations
 
