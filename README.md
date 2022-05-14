@@ -1,6 +1,7 @@
 # DXTracker Display
 ![ATOM Lite](https://img.shields.io/badge/M5Stack-ATOM%20Lite-darkgrey)
 ![ATOM Echo Smart](https://img.shields.io/badge/M5Stack-ATOM%20Echo%20Smart-white)
+![ATOM Matrix](https://img.shields.io/badge/M5Stack-ATOM%20Matrix-blue)
 
 ![licence](https://img.shields.io/github/license/armel/DXTrackerDisplay)
 ![language](https://img.shields.io/github/languages/top/armel/DXTrackerDisplay)
