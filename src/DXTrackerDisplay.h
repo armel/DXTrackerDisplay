@@ -1,13 +1,13 @@
 // Copyright (c) F4HWN Armel. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#define VERSION "0.0.3"
+#define VERSION "0.0.4"
 #define AUTHOR "F4HWN"
 #define NAME "DXTrackerDisplay"
 
-#define TIMEOUT_SCREENSAVER   1 * 10 * 1000   // 5 min
-#define TIMEOUT_MAP           5 * 1000        // 5 sec
-#define TIMEOUT_TEMPORISATION 10 * 1000       // 10 sec
+#define TIMEOUT_SCREENSAVER   5 * 60 * 1000 // 5 min
+#define TIMEOUT_MAP                5 * 1000 // 5 sec
+#define TIMEOUT_TEMPORISATION     10 * 1000 // 10 sec
 
 #define WIDTH 1024
 #define HEIGHT 768
@@ -134,7 +134,7 @@ String greylineUrl = "";
 String reloadState = "";
 
 boolean decoded = 0;
-boolean startup = 0;
+boolean reload = 0;
 boolean screensaverMode = 0;
 boolean greylineRefresh = 0;
 boolean greylineSelect = 0;
@@ -149,7 +149,7 @@ int16_t parenthesisLast = 0;
 
 uint32_t temporisation;
 uint32_t screensaver;
-uint32_t frequencyExclude[] = {
+long frequencyExclude[] = {
   1840, 1842, 3573, 5357,	
   7056, 7071, 7074, 7078,
   10130, 10132, 10133, 10136, 

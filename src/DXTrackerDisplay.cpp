@@ -12,9 +12,6 @@
 // Setup
 void setup()
 {
-  // Init screensaver timer
-  screensaver = millis();
-
   // Init M5
   auto cfg = M5.config();
   M5.begin(cfg);
@@ -160,6 +157,60 @@ void setup()
     preferences.putUInt("map", greylineSelect);
   }
 
+  // Let's go after temporisation
+  delay(250);
+
+  // Waiting for data
+  display.setTextColor(TFT_WHITE, TFT_BLACK);
+  display.setFont(&Rounded_Elegance14pt7b);
+  display.setTextDatum(CC_DATUM);
+  display.setTextPadding(320);
+
+  while(greylineData == "" || hamQSLData == "" || hamQTHData == "" || satData == "") 
+  {
+    display.drawString("Loading datas", WIDTH / 2, 380);
+    delay(250);
+    display.drawString(" ", WIDTH / 2, 280);
+    delay(250);
+    display.drawString("It takes a while, so please wait !", WIDTH / 2, 440);
+
+    if(greylineData == "")
+    {
+      getGreyline();
+      if(greylineData != "")
+      {
+        display.drawString("Greyline Ok", WIDTH / 2, 500);
+      }
+    }
+
+    if(hamQSLData == "")
+    {
+      getHamQSL();
+      if(hamQSLData != "")
+      {
+        display.drawString("Solar Ok", WIDTH / 2, 540);
+      }
+    }
+
+    if(hamQTHData == "")
+    {
+      getHamQTH();
+      if(hamQTHData != "")
+      {
+        display.drawString("Cluster Ok", WIDTH / 2, 580);
+      }
+    }
+
+    if(satData == "")
+    {
+      getHamSat();
+      if(satData != "")
+      {
+        display.drawString("Sat Ok", WIDTH / 2, 620);
+      }
+    }
+  }
+  
   // Multitasking task for retreive propag data
   xTaskCreatePinnedToCore(
       hamdata,        // Function to implement the task
@@ -180,43 +231,6 @@ void setup()
       &buttonHandle,  // Task handle
       1);             // Core where the task should run
 
-  // Let's go after temporisation
-  delay(250);
-
-  // Waiting for data
-  display.setTextColor(TFT_WHITE, TFT_BLACK);
-  display.setFont(&Rounded_Elegance14pt7b);
-  display.setTextDatum(CC_DATUM);
-  display.setTextPadding(320);
-
-  while(greylineData == "" || hamQSLData == "" || hamQTHData == "" || satData == "") 
-  {
-    display.drawString("Loading datas", WIDTH / 2, 380);
-    delay(250);
-    display.drawString(" ", WIDTH / 2, 280);
-    delay(250);
-    display.drawString("It takes a while, so please wait !", WIDTH / 2, 440);
-
-    if(greylineData != "")
-    {
-      display.drawString("Greyline Ok", WIDTH / 2, 500);
-    }
-    if(hamQSLData != "")
-    {
-      display.drawString("Solar Ok", WIDTH / 2, 540);
-    }
-    if(hamQTHData != "")
-    {
-      display.drawString("Cluster Ok", WIDTH / 2, 580);
-    }
-    if(satData != "")
-    {
-      display.drawString("Sat Ok", WIDTH / 2, 620);
-    }
-  }
-
-  startup = 1;
-  
   delay(500);
 
   // Clear screen
@@ -252,21 +266,17 @@ void loop()
   // Manage scroll
   scroll();
 
-  // Manage screensaver
-  wakeAndSleep();
-
   // Manage alternance
-  if(screenRefresh == 0 && millis() - temporisation > TIMEOUT_TEMPORISATION) {
+  if(millis() - temporisation > TIMEOUT_TEMPORISATION) {
     temporisation = millis();
-    alternance++;
-    alternance = (alternance > 11) ? 0 : alternance;
+    alternance = (alternance++ > 10) ? 0 : alternance;
+    if(alternance == 0) {
+      reload = 0;
+      updateLocalTime(); // Update local time
+      Serial.println(dateString);
+      messageCurrent = (messageCurrent++ < 3) ? messageCurrent : 0;
+    }
+    //Serial.println(alternance);
+    //Serial.println(messageCurrent);
   }
-
-  /*
-  Serial.print(millis() - screensaver);
-  Serial.print(" - ");
-  Serial.print(screensaverMode);
-  Serial.print(" - ");
-  Serial.println(TIMEOUT_TEMPORISATION);
-  */
 }
