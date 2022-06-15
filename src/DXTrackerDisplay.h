@@ -7,7 +7,7 @@
 
 #define TIMEOUT_SCREENSAVER   5 * 60 * 1000 // 5 min
 #define TIMEOUT_MAP                5 * 1000 // 5 sec
-#define TIMEOUT_TEMPORISATION     10 * 1000 // 10 sec
+#define TIMEOUT_TEMPORISATION      5 * 1000 // 5 sec
 
 #define WIDTH 1024
 #define HEIGHT 768

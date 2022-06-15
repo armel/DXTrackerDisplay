@@ -271,11 +271,11 @@ void loop()
     temporisation = millis();
     alternance = (alternance++ > 10) ? 0 : alternance;
     if(alternance == 0) {
+      messageCurrent = (messageCurrent++ < 3) ? messageCurrent : 0;
       reload = 0;
       updateLocalTime(); // Update local time
-      Serial.println(dateString);
-      messageCurrent = (messageCurrent++ < 3) ? messageCurrent : 0;
     }
+    //Serial.println(dateString);
     //Serial.println(alternance);
     //Serial.println(messageCurrent);
   }

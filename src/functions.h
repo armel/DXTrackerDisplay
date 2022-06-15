@@ -332,11 +332,9 @@ void clusterAndSatMessage()
     if(binarise().charAt(0) == '0')
     {
       posA = 80;
-      Serial.println("---> DX " + String(posA));
+      messageA = "";
 
       size_t n = sizeof(frequencyExclude)/sizeof(frequencyExclude[0]);
-
-      messageA = "";
 
       for (uint8_t i = 0; i < 30; i++)
       {
@@ -383,9 +381,8 @@ void clusterAndSatMessage()
     else if(binarise().charAt(0) == '1' && reloadState == "")
     {
       posA = 80;
-      Serial.println("---> Sat " + String(posA));
-
       messageA = "";
+
       if(satData.length() > 32)
       {
         messageA = satData.substring(15, satData.length() - 3);
