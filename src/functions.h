@@ -464,7 +464,7 @@ void getGreyline()
       SPIFFS.remove("/greyline.jpg");
       SPIFFS.rename("/tmp.jpg", "/greyline.jpg");
       vTaskDelay(pdMS_TO_TICKS(50));
-      Serial.println("Rename file");
+      //Serial.println("Rename file");
       greylineRefresh = 1;
       greylineData = "Ok";
     }
@@ -474,10 +474,10 @@ void getGreyline()
   }
 
   if(check == 1) {
-    Serial.println("HTTP Error !");
+    Serial.println("---> HTTP Error !");
   }
   else if(check == 2) {
-    Serial.println("Image Corrupt !");
+    Serial.println("---> Image Corrupt !");
   }
 
   reloadState = "";

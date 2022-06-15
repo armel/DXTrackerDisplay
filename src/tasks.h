@@ -12,9 +12,9 @@ void hamdata(void *pvParameters)
       switch (messageCurrent)
       {
         case 0: getGreyline(); break;
-        case 1: getHamQSL(); break;
-        case 2: getHamQTH(); break;
-        case 3: getHamSat(); break;
+        case 1: getHamSat(); getHamQTH(); break;
+        case 2: getGreyline(); break;
+        case 3: getHamQSL(); break;
       }
       reload = 1;
     }
