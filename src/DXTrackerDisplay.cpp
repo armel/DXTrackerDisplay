@@ -37,7 +37,6 @@ void setup()
 
   // LCD
   display.fillScreen(display.color565(TFT_BACK.r, TFT_BACK.g, TFT_BACK.b));
-  screensaver = millis(); // Screensaver update !!!
 
   // SPIFFS
   if(!SPIFFS.begin())

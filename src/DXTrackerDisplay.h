@@ -5,7 +5,6 @@
 #define AUTHOR "F4HWN"
 #define NAME "DXTrackerDisplay"
 
-#define TIMEOUT_SCREENSAVER   5 * 60 * 1000 // 5 min
 #define TIMEOUT_MAP                5 * 1000 // 5 sec
 #define TIMEOUT_TEMPORISATION      5 * 1000 // 5 sec
 
@@ -135,7 +134,6 @@ String reloadState = "";
 
 boolean decoded = 0;
 boolean reload = 0;
-boolean screensaverMode = 0;
 boolean greylineRefresh = 0;
 boolean greylineSelect = 0;
 
@@ -148,7 +146,6 @@ int16_t parenthesisBegin = 0;
 int16_t parenthesisLast = 0;
 
 uint32_t temporisation;
-uint32_t screensaver;
 long frequencyExclude[] = {
   1840, 1842, 3573, 5357,	
   7056, 7071, 7074, 7078,
