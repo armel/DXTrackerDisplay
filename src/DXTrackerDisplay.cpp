@@ -214,7 +214,7 @@ void setup()
   xTaskCreatePinnedToCore(
       hamdata,        // Function to implement the task
       "hamdata",      // Name of the task
-      16384,          // Stack size in words
+      8192,          // Stack size in words
       NULL,           // Task input parameter
       1,              // Priority of the task
       &hamdataHandle, // Task handle
@@ -277,5 +277,6 @@ void loop()
     //Serial.println(dateString);
     //Serial.println(alternance);
     //Serial.println(messageCurrent);
+    Serial.println(String(ESP.getFreeHeap() / 1024) + " kb" + " / " + String(esp_get_minimum_free_heap_size() / 1024) + " kb");
   }
 }

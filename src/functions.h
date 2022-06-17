@@ -322,6 +322,7 @@ void propagMessage()
 void clusterAndSatMessage()
 {
   boolean exclude = 0;
+  uint8_t next = 0;
   uint8_t counter = 0;
   static uint8_t messageOld = 64;
   long tmp = 0;
@@ -336,12 +337,12 @@ void clusterAndSatMessage()
 
       size_t n = sizeof(frequencyExclude)/sizeof(frequencyExclude[0]);
 
-      for (uint8_t i = 0; i < 30; i++)
+      cluster = getValue(hamQTHData, '|', next);
+      while(cluster != "")
       {
-        cluster[i] = getValue(hamQTHData, '|', i);
-        frequency[i] = getValue(cluster[i], '^', 1);
-        tmp = frequency[i].toInt();
-        
+        frequency = getValue(cluster, '^', 1);
+        tmp = frequency.toInt();
+
         exclude = 0;
 
         for (uint8_t j = 0; j < n; j++)
@@ -355,18 +356,17 @@ void clusterAndSatMessage()
 
         if(exclude == 0)
         {    
-          call[i] = getValue(cluster[i], '^', 0);
-          band[i] = getValue(cluster[i], '^', 8);
-          country[i] = getValue(cluster[i], '^', 9);
-
-          messageA += call[i] + " " + band[i] + " " + frequency[i] + " " + country[i] + " -- ";
+          messageA += getValue(cluster, '^', 0) + " " + getValue(cluster, '^', 8) + " " + frequency + " " + getValue(cluster, '^', 9) + " -- ";
           counter += 1;
         }
 
-        if(counter == 10) 
+        if(counter == 20) 
         {
           break;
         }
+
+        next++;
+        cluster = getValue(hamQTHData, '|', next);
       }
       if(messageA != "")
       {
@@ -431,6 +431,7 @@ void scroll()
 // get Greyline data
 void getGreyline()
 {
+  WiFiClient client;
   HTTPClient http;
   uint16_t httpCode, check;
   File f;
@@ -438,18 +439,28 @@ void getGreyline()
   reloadState = "Greyline";
   Serial.println(reloadState);
 
-  greylineUrl = "";
-  http.begin(clientGreyline, endpointGreyline[greylineSelect]);   // Specify the URL
+  http.begin(client, endpointGreyline[greylineSelect]);   // Specify the URL
   http.addHeader("User-Agent","M5Stack");         // Specify header
   http.addHeader("Connection","keep-alive");      // Specify header
-  http.setTimeout(500);                           // Set Time Out
+  http.setTimeout(2000);                          // Set Time Out
   check = 0;
   f = SPIFFS.open("/tmp.jpg", "w+");
   if (f) {
-    int httpCode = http.GET();
+    httpCode = http.GET();
     if (httpCode == 200) {
-      http.writeToStream(&f);
-      vTaskDelay(pdMS_TO_TICKS(50));
+      //http.writeToStream(&f);
+      //vTaskDelay(pdMS_TO_TICKS(50));
+      int len = http.getSize();
+      uint8_t buff[128] = { 0 };
+      WiFiClient* stream = &client;
+      // read all data from server
+      while (http.connected() && (len > 0 || len == -1)) 
+      {
+        // read up to 128 byte
+        int c = stream->readBytes(buff, std::min((size_t)len, sizeof(buff)));
+        f.write(buff, c);
+        if (len > 0) { len -= c; }
+      }
     } else {
       check = 1;
     }
@@ -457,6 +468,8 @@ void getGreyline()
 
   f.close();
   http.end(); // Free the resources
+  client.flush();
+  client.stop();
 
   if(check == 0) {
     decoded = JpegDec.decodeFsFile("/tmp.jpg");
@@ -486,15 +499,16 @@ void getGreyline()
 // get Solar data
 void getHamQSL()
 {
+  WiFiClient client;
   HTTPClient http;
   uint16_t httpCode;
 
   reloadState = "Solar";
   Serial.println(reloadState);
 
-  http.begin(clientHamQSL, endpointHamQSL);       // Specify the URL
+  http.begin(client, endpointHamQSL);       // Specify the URL
   http.addHeader("Content-Type", "text/plain");   // Specify content-type header
-  http.setTimeout(750);                           // Set Time Out
+  http.setTimeout(1000);                           // Set Time Out
   httpCode = http.GET();                          // Make the request
   if (httpCode == 200)                            // Check for the returning code
   {
@@ -507,6 +521,8 @@ void getHamQSL()
     }
   }
   http.end(); // Free the resources
+  client.flush();
+  client.stop();
 
   reloadState = "";
 }
@@ -514,15 +530,16 @@ void getHamQSL()
 // get Cluster data
 void getHamQTH()
 {
+  WiFiClient client;
   HTTPClient http;
   uint16_t httpCode;
 
   reloadState = "Cluster";
   Serial.println(reloadState);
 
-  http.begin(clientHamQTH, endpointHamQTH);       // Specify the URL
+  http.begin(client, endpointHamQTH);       // Specify the URL
   http.addHeader("Content-Type", "text/plain");   // Specify content-type header
-  http.setTimeout(750);                           // Set Time Out
+  http.setTimeout(1000);                           // Set Time Out
   httpCode = http.GET();                          // Make the request
   if (httpCode == 200)                            // Check for the returning code
   {
@@ -536,6 +553,8 @@ void getHamQTH()
     }
   }
   http.end(); // Free the resources
+  client.flush();
+  client.stop();
 
   reloadState = "";
 }
@@ -543,15 +562,16 @@ void getHamQTH()
 // get Sat data
 void getHamSat()
 {
+  WiFiClient client;
   HTTPClient http;
   uint16_t httpCode;
 
   reloadState = "Sat";
   Serial.println(reloadState);
 
-  http.begin(clientSat, endpointSat + "?lat=" + config[(configCurrent * 4) + 2] + "&lng=" + config[(configCurrent * 4) + 3] + "&format=text");       // Specify the URL
+  http.begin(client, endpointSat + "?lat=" + config[(configCurrent * 4) + 2] + "&lng=" + config[(configCurrent * 4) + 3] + "&format=text");       // Specify the URL
   http.addHeader("Content-Type", "text/plain");   // Specify content-type header
-  http.setTimeout(2000);                          // Set Time Out
+  http.setTimeout(1000);                          // Set Time Out
   httpCode = http.GET();                          // Make the request
   if (httpCode == 200)                            // Check for the returning code
   {
@@ -564,6 +584,8 @@ void getHamSat()
     }
   }
   http.end(); // Free the resources
+  client.flush();
+  client.stop();
 
   reloadState = "";
 }

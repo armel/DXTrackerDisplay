@@ -18,7 +18,7 @@ void hamdata(void *pvParameters)
       }
       reload = 1;
     }
-    vTaskDelay(pdMS_TO_TICKS(250));
+    vTaskDelay(pdMS_TO_TICKS(20));
   }
 }
 
@@ -49,6 +49,6 @@ void button(void *pvParameters)
         screenRefresh = 2;
       }
     }
-    vTaskDelay(pdMS_TO_TICKS(250));
+    vTaskDelay(pdMS_TO_TICKS(100));
   }
 }
