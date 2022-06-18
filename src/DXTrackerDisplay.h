@@ -22,8 +22,6 @@
 #include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include <Preferences.h>
-#include <FS.h>
-#include <SPIFFS.h>
 #include <M5AtomDisplay.h>
 #include <M5Unified.h>
 
