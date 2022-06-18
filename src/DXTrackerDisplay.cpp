@@ -210,26 +210,6 @@ void setup()
     }
   }
   
-  // Multitasking task for retreive propag data
-  xTaskCreatePinnedToCore(
-      hamdata,        // Function to implement the task
-      "hamdata",      // Name of the task
-      8192,          // Stack size in words
-      NULL,           // Task input parameter
-      1,              // Priority of the task
-      &hamdataHandle, // Task handle
-      0);             // Core where the task should run
-
-  // Multitasking task for retreive button
-  xTaskCreatePinnedToCore(
-      button,         // Function to implement the task
-      "button",       // Name of the task
-      8192,           // Stack size in words
-      NULL,           // Task input parameter
-      1,              // Priority of the task
-      &buttonHandle,  // Task handle
-      1);             // Core where the task should run
-
   delay(500);
 
   // Clear screen
@@ -241,15 +221,35 @@ void setup()
   }
 
   // And clear
-  screenRefresh = 1;
+  clear();
+
+  getGreyline();
+
+  // Multitasking task for retreive propag data
+  xTaskCreatePinnedToCore(
+      hamdata,        // Function to implement the task
+      "hamdata",      // Name of the task
+      8192,          // Stack size in words
+      NULL,           // Task input parameter
+      2,              // Priority of the task
+      &hamdataHandle, // Task handle
+      1);             // Core where the task should run
+
+  // Multitasking task for retreive button
+  xTaskCreatePinnedToCore(
+      button,         // Function to implement the task
+      "button",       // Name of the task
+      8192,           // Stack size in words
+      NULL,           // Task input parameter
+      1,              // Priority of the task
+      &buttonHandle,  // Task handle
+      1);             // Core where the task should run
+
 }
 
 // Main loop
 void loop()
 {
-  // Let's clean if necessary
-  clear();
-
   // View propag datas
   propagData();
 
@@ -258,9 +258,6 @@ void loop()
 
   // Prepare propag scroll message
   propagMessage();
-
-  // View greyline
-  greyline();
 
   // Manage scroll
   scroll();
@@ -274,9 +271,5 @@ void loop()
       reload = 0;
       updateLocalTime(); // Update local time
     }
-    //Serial.println(dateString);
-    //Serial.println(alternance);
-    //Serial.println(messageCurrent);
-    Serial.println(String(ESP.getFreeHeap() / 1024) + " kb" + " / " + String(esp_get_minimum_free_heap_size() / 1024) + " kb");
   }
 }

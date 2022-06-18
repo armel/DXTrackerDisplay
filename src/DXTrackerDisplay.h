@@ -5,6 +5,8 @@
 #define AUTHOR "F4HWN"
 #define NAME "DXTrackerDisplay"
 
+#define DEBUG 1
+
 #define TIMEOUT_MAP                5 * 1000 // 5 sec
 #define TIMEOUT_TEMPORISATION      5 * 1000 // 5 sec
 
@@ -20,7 +22,6 @@
 #include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include <Preferences.h>
-#include <JPEGDecoder.h>
 #include <FS.h>
 #include <SPIFFS.h>
 #include <M5AtomDisplay.h>
@@ -28,13 +29,9 @@
 
 M5AtomDisplay display(WIDTH, HEIGHT);
 
-static constexpr char text[] = "Hello world this is long long string sample.";
-static constexpr size_t textlen = sizeof(text) / sizeof(text[0]);
-int textpos = 0;
-int scrollstep = 1;
-
 // Wifi
-//WiFiClient client;
+WiFiClient client;
+HTTPClient http;
 
 // Preferences
 Preferences preferences;
@@ -131,12 +128,11 @@ String dateString;
 String greylineData = "", hamQSLData = "", hamQTHData = "", satData = "";
 String reloadState = "";
 
-boolean decoded = 0;
 boolean reload = 0;
 boolean greylineRefresh = 0;
 boolean greylineSelect = 0;
 
-uint8_t screenRefresh = 1;
+uint8_t screenRefresh = 0;
 uint8_t alternance = 0;
 uint8_t configCurrent = 0;
 uint8_t messageCurrent = 0;

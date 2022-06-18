@@ -24,13 +24,11 @@ String getValue(String data, char separator, uint16_t index)
 // Clear screen
 void clear()
 {
-  if(screenRefresh == 1) {
-    display.clear();
-    display.fillRect(0, 0, WIDTH, 145, display.color565(TFT_BACK.r, TFT_BACK.g, TFT_BACK.b));
-    display.drawFastHLine(  0, 0, WIDTH, TFT_WHITE);
-    display.drawFastHLine(  0, 145, WIDTH, TFT_WHITE);
-    display.drawFastHLine(  0, 289, WIDTH, TFT_WHITE);
-  }
+  display.clear();
+  display.fillRect(0, 0, WIDTH, 145, display.color565(TFT_BACK.r, TFT_BACK.g, TFT_BACK.b));
+  display.drawFastHLine(  0, 0, WIDTH, TFT_WHITE);
+  display.drawFastHLine(  0, 145, WIDTH, TFT_WHITE);
+  display.drawFastHLine(  0, 289, WIDTH, TFT_WHITE);
 }
 
 // Manage message cycle
@@ -157,7 +155,7 @@ void title(String title)
   static String baselineOld;
   static String reloadStateOld;
 
-  if(screenRefresh == 1 || screenRefresh == 2) {
+  if(screenRefresh == 1) {
     titleOld = "";
     baselineOld = "";
     reloadStateOld = "";
@@ -221,6 +219,16 @@ void title(String title)
     display.setTextDatum(ML_DATUM);
     display.setTextPadding(120);
     display.drawString(tmpString, 18, 120);
+  }
+
+  // Memory trace
+  if (DEBUG)
+  {
+    display.setTextColor(display.color565(TFT_GRAY.r, TFT_GRAY.g, TFT_GRAY.b), display.color565(TFT_BACK.r, TFT_BACK.g, TFT_BACK.b));
+    display.setFont(&Rounded_Elegance14pt7b);
+    display.setTextDatum(MR_DATUM);
+    display.setTextPadding(120);
+    display.drawString(String(ESP.getFreeHeap() / 1024) + " kb" + " / " + String(esp_get_minimum_free_heap_size() / 1024) + " kb", 1006, 120);
   }
 }
 
@@ -399,20 +407,6 @@ void clusterAndSatMessage()
   }
 }
 
-// Draw Greyline
-void greyline()
-{  
-  if(greylineRefresh == 1)
-  {
-    // Draw greyline
-    decoded = JpegDec.decodeFsFile("/greyline.jpg");
-    if (decoded) {
-      display.drawJpgFile(SPIFFS, "/greyline.jpg", 0, 290, 1024, 512, 0, 34);
-      greylineRefresh = 0;
-    }
-  }
-}
-
 // Manage scroll
 void scroll()
 {
@@ -431,80 +425,28 @@ void scroll()
 // get Greyline data
 void getGreyline()
 {
-  WiFiClient client;
-  HTTPClient http;
-  uint16_t httpCode, check;
-  File f;
-
   reloadState = "Greyline";
-  Serial.println(reloadState);
-
-  http.begin(client, endpointGreyline[greylineSelect]);   // Specify the URL
-  http.addHeader("User-Agent","M5Stack");         // Specify header
-  http.addHeader("Connection","keep-alive");      // Specify header
-  http.setTimeout(2000);                          // Set Time Out
-  check = 0;
-  f = SPIFFS.open("/tmp.jpg", "w+");
-  if (f) {
-    httpCode = http.GET();
-    if (httpCode == 200) {
-      //http.writeToStream(&f);
-      //vTaskDelay(pdMS_TO_TICKS(50));
-      int len = http.getSize();
-      uint8_t buff[128] = { 0 };
-      WiFiClient* stream = &client;
-      // read all data from server
-      while (http.connected() && (len > 0 || len == -1)) 
-      {
-        // read up to 128 byte
-        int c = stream->readBytes(buff, std::min((size_t)len, sizeof(buff)));
-        f.write(buff, c);
-        if (len > 0) { len -= c; }
-      }
-    } else {
-      check = 1;
-    }
+  if (DEBUG) Serial.println(reloadState);
+  
+  if(greylineData == "")
+  {
+    greylineData = "Ok";
+  }
+  else {
+    display.drawJpgUrl(endpointGreyline[greylineSelect],  0, 290, 1024, 512, 0, 34);
   }
 
-  f.close();
-  http.end(); // Free the resources
-  client.flush();
-  client.stop();
-
-  if(check == 0) {
-    decoded = JpegDec.decodeFsFile("/tmp.jpg");
-    if (decoded) {
-      SPIFFS.remove("/greyline.jpg");
-      SPIFFS.rename("/tmp.jpg", "/greyline.jpg");
-      vTaskDelay(pdMS_TO_TICKS(50));
-      //Serial.println("Rename file");
-      greylineRefresh = 1;
-      greylineData = "Ok";
-    }
-    else {
-      check = 2;
-    }
-  }
-
-  if(check == 1) {
-    Serial.println("---> HTTP Error !");
-  }
-  else if(check == 2) {
-    Serial.println("---> Image Corrupt !");
-  }
-
+  vTaskDelay(pdMS_TO_TICKS(20));
   reloadState = "";
 }
 
 // get Solar data
 void getHamQSL()
 {
-  WiFiClient client;
-  HTTPClient http;
   uint16_t httpCode;
 
   reloadState = "Solar";
-  Serial.println(reloadState);
+  if (DEBUG) Serial.println(reloadState);
 
   http.begin(client, endpointHamQSL);       // Specify the URL
   http.addHeader("Content-Type", "text/plain");   // Specify content-type header
@@ -524,18 +466,17 @@ void getHamQSL()
   client.flush();
   client.stop();
 
+  vTaskDelay(pdMS_TO_TICKS(20));
   reloadState = "";
 }
 
 // get Cluster data
 void getHamQTH()
 {
-  WiFiClient client;
-  HTTPClient http;
   uint16_t httpCode;
 
   reloadState = "Cluster";
-  Serial.println(reloadState);
+  if (DEBUG) Serial.println(reloadState);
 
   http.begin(client, endpointHamQTH);       // Specify the URL
   http.addHeader("Content-Type", "text/plain");   // Specify content-type header
@@ -556,18 +497,17 @@ void getHamQTH()
   client.flush();
   client.stop();
 
+  vTaskDelay(pdMS_TO_TICKS(20));
   reloadState = "";
 }
 
 // get Sat data
 void getHamSat()
 {
-  WiFiClient client;
-  HTTPClient http;
   uint16_t httpCode;
 
   reloadState = "Sat";
-  Serial.println(reloadState);
+  if (DEBUG) Serial.println(reloadState);
 
   http.begin(client, endpointSat + "?lat=" + config[(configCurrent * 4) + 2] + "&lng=" + config[(configCurrent * 4) + 3] + "&format=text");       // Specify the URL
   http.addHeader("Content-Type", "text/plain");   // Specify content-type header
@@ -587,5 +527,6 @@ void getHamSat()
   client.flush();
   client.stop();
 
+  vTaskDelay(pdMS_TO_TICKS(20));
   reloadState = "";
 }
