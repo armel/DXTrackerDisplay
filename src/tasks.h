@@ -14,7 +14,7 @@ void hamdata(void *pvParameters)
         case 0: getGreyline(); break;
         case 1: getHamSat(); getHamQTH(); break;
         case 2: getGreyline(); break;
-        //case 3: getHamQSL(); break;
+        case 3: getHamQSL(); break;
       }
       reload = 1;
     }
