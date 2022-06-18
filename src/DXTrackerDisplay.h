@@ -5,7 +5,7 @@
 #define AUTHOR "F4HWN"
 #define NAME "DXTrackerDisplay"
 
-#define DEBUG 1
+#define DEBUG 0
 
 #define TIMEOUT_MAP                5 * 1000 // 5 sec
 #define TIMEOUT_TEMPORISATION      5 * 1000 // 5 sec

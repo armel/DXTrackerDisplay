@@ -193,7 +193,7 @@ void title(String title)
     display.setTextColor(TFT_WHITE, display.color565(TFT_BACK.r, TFT_BACK.g, TFT_BACK.b));
     display.setFont(&Rounded_Elegance20pt7b);
     display.setTextDatum(CC_DATUM);
-    display.setTextPadding(WIDTH);
+    display.setTextPadding(WIDTH - 400);
     display.drawString(tmpString, WIDTH / 2, 120);
   }
 
@@ -428,14 +428,8 @@ void getGreyline()
   reloadState = "Greyline";
   if (DEBUG) Serial.println(reloadState);
   
-  if(greylineData == "")
-  {
-    greylineData = "Ok";
-  }
-  else {
-    display.drawJpgUrl(endpointGreyline[greylineSelect],  0, 290, 1024, 512, 0, 34);
-  }
-
+  display.drawJpgUrl(endpointGreyline[greylineSelect],  0, 290, 1024, 512, 0, 34);
+  
   vTaskDelay(pdMS_TO_TICKS(20));
   reloadState = "";
 }

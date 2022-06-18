@@ -165,38 +165,17 @@ void setup()
   display.setTextDatum(CC_DATUM);
   display.setTextPadding(320);
 
-  while(greylineData == "" || hamQSLData == "" || hamQTHData == "" || satData == "") 
+  while(hamQSLData == "" || hamQTHData == "" || satData == "") 
   {
     display.drawString("Loading datas", WIDTH / 2, 380);
-    delay(250);
-    display.drawString(" ", WIDTH / 2, 280);
-    delay(250);
     display.drawString("It takes a while, so please wait !", WIDTH / 2, 440);
-
-    if(greylineData == "")
-    {
-      getGreyline();
-      if(greylineData != "")
-      {
-        display.drawString("Greyline Ok", WIDTH / 2, 500);
-      }
-    }
-
-    if(hamQSLData == "")
-    {
-      getHamQSL();
-      if(hamQSLData != "")
-      {
-        display.drawString("Solar Ok", WIDTH / 2, 540);
-      }
-    }
 
     if(hamQTHData == "")
     {
       getHamQTH();
       if(hamQTHData != "")
       {
-        display.drawString("Cluster Ok", WIDTH / 2, 580);
+        display.drawString("Cluster Ok", WIDTH / 2, 500);
       }
     }
 
@@ -205,7 +184,16 @@ void setup()
       getHamSat();
       if(satData != "")
       {
-        display.drawString("Sat Ok", WIDTH / 2, 620);
+        display.drawString("Sat Ok", WIDTH / 2, 540);
+      }
+    }
+
+    if(hamQSLData == "")
+    {
+      getHamQSL();
+      if(hamQSLData != "")
+      {
+        display.drawString("Solar Ok", WIDTH / 2, 580);
       }
     }
   }
@@ -223,13 +211,11 @@ void setup()
   // And clear
   clear();
 
-  getGreyline();
-
   // Multitasking task for retreive propag data
   xTaskCreatePinnedToCore(
       hamdata,        // Function to implement the task
       "hamdata",      // Name of the task
-      8192,          // Stack size in words
+      8192,           // Stack size in words
       NULL,           // Task input parameter
       2,              // Priority of the task
       &hamdataHandle, // Task handle
@@ -270,6 +256,7 @@ void loop()
       messageCurrent = (messageCurrent++ < 3) ? messageCurrent : 0;
       reload = 0;
       updateLocalTime(); // Update local time
+      Serial.println(String(ESP.getFreeHeap() / 1024) + " kb" + " / " + String(esp_get_minimum_free_heap_size() / 1024) + " kb");
     }
   }
 }
