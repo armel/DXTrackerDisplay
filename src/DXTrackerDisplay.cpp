@@ -18,8 +18,6 @@ void setup()
 
   display.begin();
 
-  Serial.println(display.width());
-
   // Preferences
   preferences.begin("DXTracker");
 
