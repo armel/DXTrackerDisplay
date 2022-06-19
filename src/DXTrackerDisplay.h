@@ -1,13 +1,14 @@
 // Copyright (c) F4HWN Armel. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#define VERSION "0.0.3"
+#define VERSION "0.0.4"
 #define AUTHOR "F4HWN"
 #define NAME "DXTrackerDisplay"
 
-#define TIMEOUT_SCREENSAVER   1 * 10 * 1000   // 5 min
-#define TIMEOUT_MAP           5 * 1000        // 5 sec
-#define TIMEOUT_TEMPORISATION 10 * 1000       // 10 sec
+#define DEBUG 0
+
+#define TIMEOUT_MAP                5 * 1000 // 5 sec
+#define TIMEOUT_TEMPORISATION      5 * 1000 // 5 sec
 
 #define WIDTH 1024
 #define HEIGHT 768
@@ -21,21 +22,14 @@
 #include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include <Preferences.h>
-#include <JPEGDecoder.h>
-#include <FS.h>
-#include <SPIFFS.h>
 #include <M5AtomDisplay.h>
 #include <M5Unified.h>
 
 M5AtomDisplay display(WIDTH, HEIGHT);
 
-static constexpr char text[] = "Hello world this is long long string sample.";
-static constexpr size_t textlen = sizeof(text) / sizeof(text[0]);
-int textpos = 0;
-int scrollstep = 1;
-
 // Wifi
-WiFiClient clientHamQSL, clientSat, clientGreyline, clientHamQTH;
+WiFiClient client;
+HTTPClient http;
 
 // Preferences
 Preferences preferences;
@@ -64,11 +58,11 @@ const char* ntpTimeZone = "CET-1CEST-2,M3.5.0/02:00:00,M10.5.0/03:00:00"; // For
 int utc = 1;
 
 // HTTP endpoint
-String endpointHamQSL = "http://www.hamqsl.com/solarxml.php";
-String endpointSat = "http://rrf2.f5nlg.ovh:8080/cgi-bin/DXSat.py";
-String endpointHamQTH = "http://rrf2.f5nlg.ovh:8080/cgi-bin/DXCluster.py";
+const String endpointHamQSL = "http://www.hamqsl.com/solarxml.php";
+const String endpointSat = "http://rrf2.f5nlg.ovh:8080/cgi-bin/DXSat.py";
+const String endpointHamQTH = "http://rrf2.f5nlg.ovh:8080/cgi-bin/DXCluster.py";
 
-String endpointGreyline[2] = {
+const String endpointGreyline[2] = {
   "http://rrf2.f5nlg.ovh:8080/greylinebig.jpg",
   "http://rrf2.f5nlg.ovh:8080/sunmapbig.jpg"
 };
@@ -89,27 +83,27 @@ String solarData[] = {
   "Aurora", "Solar Wind", "Magnetic Field", "Signal Noise"
 };
 
-String solarKey[] = {
+const String solarKey[] = {
   "solarflux", "sunspots", "aindex", "kindex", 
   "xray", "heliumline", "protonflux", "electonflux", 
   "aurora", "solarwind", "magneticfield", "signalnoise"
 };
 
-String skipData[] = {
+const String skipData[] = {
   "E-Skip North America",
   "E-Skip Europe",
   "E-Skip Europe 4m",
   "E-Skip Europe 6m",
 };
 
-String skipKey[] = {
+const String skipKey[] = {
   "location=\"north_america\">", 
   "location=\"europe\">", 
   "location=\"europe_4m\">",  
   "location=\"europe_6m\">" 
 };
 
-String propagKey[] = {
+const String propagKey[] = {
   "80m-40m\" time=\"day\">", 
   "30m-20m\" time=\"day\">", 
   "17m-15m\" time=\"day\">", 
@@ -120,7 +114,7 @@ String propagKey[] = {
   "12m-10m\" time=\"night\">"    
 };
 
-String cluster[30], call[30], frequency[30], band[30], country[30];
+String cluster, call, frequency, band, country;
 
 // Task Handle
 TaskHandle_t hamdataHandle;
@@ -130,16 +124,13 @@ TaskHandle_t buttonHandle;
 String tmpString;
 String dateString;
 String greylineData = "", hamQSLData = "", hamQTHData = "", satData = "";
-String greylineUrl = "";
 String reloadState = "";
 
-boolean decoded = 0;
-boolean startup = 0;
-boolean screensaverMode = 0;
+boolean reload = 0;
 boolean greylineRefresh = 0;
 boolean greylineSelect = 0;
 
-uint8_t screenRefresh = 1;
+uint8_t screenRefresh = 0;
 uint8_t alternance = 0;
 uint8_t configCurrent = 0;
 uint8_t messageCurrent = 0;
@@ -148,8 +139,7 @@ int16_t parenthesisBegin = 0;
 int16_t parenthesisLast = 0;
 
 uint32_t temporisation;
-uint32_t screensaver;
-uint32_t frequencyExclude[] = {
+long frequencyExclude[] = {
   1840, 1842, 3573, 5357,	
   7056, 7071, 7074, 7078,
   10130, 10132, 10133, 10136, 

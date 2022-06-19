@@ -24,13 +24,11 @@ String getValue(String data, char separator, uint16_t index)
 // Clear screen
 void clear()
 {
-  if(screenRefresh == 1) {
-    display.clear();
-    display.fillRect(0, 0, WIDTH, 145, display.color565(TFT_BACK.r, TFT_BACK.g, TFT_BACK.b));
-    display.drawFastHLine(  0, 0, WIDTH, TFT_WHITE);
-    display.drawFastHLine(  0, 145, WIDTH, TFT_WHITE);
-    display.drawFastHLine(  0, 289, WIDTH, TFT_WHITE);
-  }
+  display.clear();
+  display.fillRect(0, 0, WIDTH, 145, display.color565(TFT_BACK.r, TFT_BACK.g, TFT_BACK.b));
+  display.drawFastHLine(  0, 0, WIDTH, TFT_WHITE);
+  display.drawFastHLine(  0, 145, WIDTH, TFT_WHITE);
+  display.drawFastHLine(  0, 289, WIDTH, TFT_WHITE);
 }
 
 // Manage message cycle
@@ -100,7 +98,7 @@ void scrollA(uint8_t pause)
   buildScrollA();
   imgA.pushSprite(48, 170);
 
-  posA -= 3;
+  posA -= 4;
   if (posA < 0)
   {
     //posA = M5.Lcd.width();
@@ -157,7 +155,7 @@ void title(String title)
   static String baselineOld;
   static String reloadStateOld;
 
-  if(screenRefresh == 1 || screenRefresh == 2) {
+  if(screenRefresh == 1) {
     titleOld = "";
     baselineOld = "";
     reloadStateOld = "";
@@ -195,7 +193,7 @@ void title(String title)
     display.setTextColor(TFT_WHITE, display.color565(TFT_BACK.r, TFT_BACK.g, TFT_BACK.b));
     display.setFont(&Rounded_Elegance20pt7b);
     display.setTextDatum(CC_DATUM);
-    display.setTextPadding(WIDTH);
+    display.setTextPadding(WIDTH - 400);
     display.drawString(tmpString, WIDTH / 2, 120);
   }
 
@@ -221,6 +219,16 @@ void title(String title)
     display.setTextDatum(ML_DATUM);
     display.setTextPadding(120);
     display.drawString(tmpString, 18, 120);
+  }
+
+  // Memory trace
+  if (DEBUG)
+  {
+    display.setTextColor(display.color565(TFT_GRAY.r, TFT_GRAY.g, TFT_GRAY.b), display.color565(TFT_BACK.r, TFT_BACK.g, TFT_BACK.b));
+    display.setFont(&Rounded_Elegance14pt7b);
+    display.setTextDatum(MR_DATUM);
+    display.setTextPadding(120);
+    display.drawString(String(ESP.getFreeHeap() / 1024) + " kb" + " / " + String(esp_get_minimum_free_heap_size() / 1024) + " kb", 1006, 120);
   }
 }
 
@@ -322,86 +330,79 @@ void propagMessage()
 void clusterAndSatMessage()
 {
   boolean exclude = 0;
+  uint8_t next = 0;
   uint8_t counter = 0;
-  uint32_t tmp = 0;
+  static uint8_t messageOld = 64;
+  long tmp = 0;
 
-  if(binarise().charAt(0) == '0')
-  {
-    size_t n = sizeof(frequencyExclude)/sizeof(frequencyExclude[0]);
+  if(messageOld != messageCurrent && reloadState == "") {
+    messageOld = messageCurrent;
 
-    messageA = "";
-    hamQTHData.replace("\n", "|");
-
-    for (uint8_t i = 0; i < 30; i++)
+    if(binarise().charAt(0) == '0')
     {
-      cluster[i] = getValue(hamQTHData, '|', i);
-      frequency[i] = getValue(cluster[i], '^', 1);
-      tmp = frequency[i].toInt();
-      
-      exclude = 0;
+      posA = 80;
+      messageA = "";
 
-      for (uint8_t j = 0; j < n; j++)
+      size_t n = sizeof(frequencyExclude)/sizeof(frequencyExclude[0]);
+
+      cluster = getValue(hamQTHData, '|', next);
+      while(cluster != "")
       {
-        if(abs(tmp - frequencyExclude[j]) <= 2 || tmp > 470000)
+        frequency = getValue(cluster, '^', 1);
+        tmp = frequency.toInt();
+
+        exclude = 0;
+
+        for (uint8_t j = 0; j < n; j++)
         {
-          exclude = 1;
+          if(abs(tmp - frequencyExclude[j]) <= 2 || tmp > 470000)
+          {
+            exclude = 1;
+            break;
+          }
+        }
+
+        if(exclude == 0)
+        {    
+          messageA += getValue(cluster, '^', 0) + " " + getValue(cluster, '^', 8) + " " + frequency + " " + getValue(cluster, '^', 9) + " -- ";
+          counter += 1;
+        }
+
+        if(counter == 20) 
+        {
           break;
         }
+
+        next++;
+        cluster = getValue(hamQTHData, '|', next);
       }
-
-      if(exclude == 0)
-      {    
-        call[i] = getValue(cluster[i], '^', 0);
-        band[i] = getValue(cluster[i], '^', 8);
-        country[i] = getValue(cluster[i], '^', 9);
-
-        messageA += call[i] + " " + band[i] + " " + frequency[i] + " " + country[i] + " -- ";
-        counter += 1;
-      }
-
-      if(counter == 10) 
+      if(messageA != "")
       {
-        break;
+        messageA = "DX Cluster -- " + messageA;
+        messageA = messageA.substring(0, messageA.length() - 4);
+      }
+      else
+      {
+        messageA = "DX Cluster -- Data acquisition on the way, please wait...";
       }
     }
-    if(messageA != "")
+    else if(binarise().charAt(0) == '1' && reloadState == "")
     {
-      messageA = "DX Cluster -- " + messageA;
-      messageA = messageA.substring(0, messageA.length() - 4);
-    }
-    else
-    {
-      messageA = "DX Cluster -- Data acquisition on the way, please wait...";
-    }
-  }
-  else if(binarise().charAt(0) == '1')
-  {
-    messageA = "";
-    if(satData.length() > 32)
-    {
-      messageA = satData.substring(15, satData.length() - 3);
-    }
-    if(messageA != "")
-    {
-      messageA = "Satellites Passes -- " + messageA;
-    }
-    else
-    {
-      messageA = "Satellites Passes -- Data acquisition on the way, please wait...";
-    }
-  }
-}
+      posA = 80;
+      messageA = "";
 
-// Draw Greyline
-void greyline()
-{  
-  if(greylineRefresh == 1)
-  {
-    // Draw greyline
-    decoded = JpegDec.decodeFsFile("/greyline.jpg");
-    if (decoded) {
-      display.drawJpgFile(SPIFFS, "/greyline.jpg", 0, 290, 1024, 512, 0, 34);
-      greylineRefresh = 0;
+      if(satData.length() > 32)
+      {
+        messageA = satData.substring(15, satData.length() - 3);
+      }
+      if(messageA != "")
+      {
+        messageA = "Satellites Passes -- " + messageA;
+      }
+      else
+      {
+        messageA = "Satellites Passes -- Data acquisition on the way, please wait...";
+      }
     }
   }
 }
@@ -414,22 +415,112 @@ void scroll()
     return;
   }
 
-  for(uint16_t i = 0; i < 10; i += 1)
+  for(uint16_t i = 0; i < 2; i += 1)
   {
     scrollA(0);
     scrollB(0);
   }
 }
 
-// Manage screensaver
-void wakeAndSleep()
+// get Greyline data
+void getGreyline()
 {
-  if (screensaverMode == 0 && millis() - screensaver > TIMEOUT_SCREENSAVER)
+  reloadState = "Greyline";
+  if (DEBUG) Serial.println(reloadState);
+  
+  display.drawJpgUrl(endpointGreyline[greylineSelect],  0, 290, 1024, 512, 0, 34);
+  
+  vTaskDelay(pdMS_TO_TICKS(20));
+  reloadState = "";
+}
+
+// get Solar data
+void getHamQSL()
+{
+  uint16_t httpCode;
+
+  reloadState = "Solar";
+  if (DEBUG) Serial.println(reloadState);
+
+  http.begin(client, endpointHamQSL);       // Specify the URL
+  http.addHeader("Content-Type", "text/plain");   // Specify content-type header
+  http.setTimeout(1000);                           // Set Time Out
+  httpCode = http.GET();                          // Make the request
+  if (httpCode == 200)                            // Check for the returning code
   {
-    screensaverMode = 1;
+    String tmpString = http.getString(); // Get data
+    tmpString.trim();
+
+    if(tmpString != "")
+    {
+      hamQSLData = tmpString;
+    }
   }
-  else if (screensaverMode == 1 && millis() - screensaver < TIMEOUT_SCREENSAVER)
+  http.end(); // Free the resources
+  client.flush();
+  client.stop();
+
+  vTaskDelay(pdMS_TO_TICKS(20));
+  reloadState = "";
+}
+
+// get Cluster data
+void getHamQTH()
+{
+  uint16_t httpCode;
+
+  reloadState = "Cluster";
+  if (DEBUG) Serial.println(reloadState);
+
+  http.begin(client, endpointHamQTH);       // Specify the URL
+  http.addHeader("Content-Type", "text/plain");   // Specify content-type header
+  http.setTimeout(1000);                           // Set Time Out
+  httpCode = http.GET();                          // Make the request
+  if (httpCode == 200)                            // Check for the returning code
   {
-    screensaverMode = 0;
+    String tmpString = http.getString(); // Get data
+    tmpString.trim();
+    tmpString.replace("\n", "|");
+
+    if(tmpString != "" && tmpString != hamQTHData)
+    {
+      hamQTHData = tmpString;
+    }
   }
+  http.end(); // Free the resources
+  client.flush();
+  client.stop();
+
+  vTaskDelay(pdMS_TO_TICKS(20));
+  reloadState = "";
+}
+
+// get Sat data
+void getHamSat()
+{
+  uint16_t httpCode;
+
+  reloadState = "Sat";
+  if (DEBUG) Serial.println(reloadState);
+
+  http.begin(client, endpointSat + "?lat=" + config[(configCurrent * 4) + 2] + "&lng=" + config[(configCurrent * 4) + 3] + "&format=text");       // Specify the URL
+  http.addHeader("Content-Type", "text/plain");   // Specify content-type header
+  http.setTimeout(1000);                          // Set Time Out
+  httpCode = http.GET();                          // Make the request
+  if (httpCode == 200)                            // Check for the returning code
+  {
+    String tmpString = http.getString(); // Get data
+    tmpString.trim();
+
+    if(tmpString != "" && tmpString != satData)
+    {
+      satData = tmpString;
+    }
+  }
+  http.end(); // Free the resources
+  client.flush();
+  client.stop();
+
+  vTaskDelay(pdMS_TO_TICKS(20));
+  reloadState = "";
 }

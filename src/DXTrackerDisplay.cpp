@@ -12,16 +12,11 @@
 // Setup
 void setup()
 {
-  // Init screensaver timer
-  screensaver = millis();
-
   // Init M5
   auto cfg = M5.config();
   M5.begin(cfg);
 
   display.begin();
-
-  Serial.println(display.width());
 
   // Preferences
   preferences.begin("DXTracker");
@@ -40,15 +35,6 @@ void setup()
 
   // LCD
   display.fillScreen(display.color565(TFT_BACK.r, TFT_BACK.g, TFT_BACK.b));
-  screensaver = millis(); // Screensaver update !!!
-
-  // SPIFFS
-  if(!SPIFFS.begin())
-  {
-    Serial.println("SPIFFS Mount Failed");
-    Serial.println("SPIFFS Formating...");
-    SPIFFS.format(); // Format SPIFFS...
-  }
 
   // Title
   display.setFont(&rounded_led_board_730pt7b);
@@ -160,26 +146,6 @@ void setup()
     preferences.putUInt("map", greylineSelect);
   }
 
-  // Multitasking task for retreive propag data
-  xTaskCreatePinnedToCore(
-      hamdata,        // Function to implement the task
-      "hamdata",      // Name of the task
-      16384,          // Stack size in words
-      NULL,           // Task input parameter
-      1,              // Priority of the task
-      &hamdataHandle, // Task handle
-      0);             // Core where the task should run
-
-  // Multitasking task for retreive button
-  xTaskCreatePinnedToCore(
-      button,         // Function to implement the task
-      "button",       // Name of the task
-      8192,           // Stack size in words
-      NULL,           // Task input parameter
-      1,              // Priority of the task
-      &buttonHandle,  // Task handle
-      1);             // Core where the task should run
-
   // Let's go after temporisation
   delay(250);
 
@@ -189,33 +155,38 @@ void setup()
   display.setTextDatum(CC_DATUM);
   display.setTextPadding(320);
 
-  while(greylineData == "" || hamQSLData == "" || hamQTHData == "" || satData == "") 
+  while(hamQSLData == "" || hamQTHData == "" || satData == "") 
   {
     display.drawString("Loading datas", WIDTH / 2, 380);
-    delay(250);
-    display.drawString(" ", WIDTH / 2, 280);
-    delay(250);
     display.drawString("It takes a while, so please wait !", WIDTH / 2, 440);
 
-    if(greylineData != "")
+    if(hamQTHData == "")
     {
-      display.drawString("Greyline Ok", WIDTH / 2, 500);
+      getHamQTH();
+      if(hamQTHData != "")
+      {
+        display.drawString("Cluster Ok", WIDTH / 2, 500);
+      }
     }
-    if(hamQSLData != "")
+
+    if(satData == "")
     {
-      display.drawString("Solar Ok", WIDTH / 2, 540);
+      getHamSat();
+      if(satData != "")
+      {
+        display.drawString("Sat Ok", WIDTH / 2, 540);
+      }
     }
-    if(hamQTHData != "")
+
+    if(hamQSLData == "")
     {
-      display.drawString("Cluster Ok", WIDTH / 2, 580);
-    }
-    if(satData != "")
-    {
-      display.drawString("Sat Ok", WIDTH / 2, 620);
+      getHamQSL();
+      if(hamQSLData != "")
+      {
+        display.drawString("Solar Ok", WIDTH / 2, 580);
+      }
     }
   }
-
-  startup = 1;
   
   delay(500);
 
@@ -228,15 +199,33 @@ void setup()
   }
 
   // And clear
-  screenRefresh = 1;
+  clear();
+
+  // Multitasking task for retreive propag data
+  xTaskCreatePinnedToCore(
+      hamdata,        // Function to implement the task
+      "hamdata",      // Name of the task
+      8192,           // Stack size in words
+      NULL,           // Task input parameter
+      2,              // Priority of the task
+      &hamdataHandle, // Task handle
+      1);             // Core where the task should run
+
+  // Multitasking task for retreive button
+  xTaskCreatePinnedToCore(
+      button,         // Function to implement the task
+      "button",       // Name of the task
+      8192,           // Stack size in words
+      NULL,           // Task input parameter
+      1,              // Priority of the task
+      &buttonHandle,  // Task handle
+      1);             // Core where the task should run
+
 }
 
 // Main loop
 void loop()
 {
-  // Let's clean if necessary
-  clear();
-
   // View propag datas
   propagData();
 
@@ -246,27 +235,18 @@ void loop()
   // Prepare propag scroll message
   propagMessage();
 
-  // View greyline
-  greyline();
-
   // Manage scroll
   scroll();
 
-  // Manage screensaver
-  wakeAndSleep();
-
   // Manage alternance
-  if(screenRefresh == 0 && millis() - temporisation > TIMEOUT_TEMPORISATION) {
+  if(millis() - temporisation > TIMEOUT_TEMPORISATION) {
     temporisation = millis();
-    alternance++;
-    alternance = (alternance > 11) ? 0 : alternance;
+    alternance = (alternance++ > 10) ? 0 : alternance;
+    if(alternance == 0) {
+      messageCurrent = (messageCurrent++ < 3) ? messageCurrent : 0;
+      reload = 0;
+      updateLocalTime(); // Update local time
+      Serial.println(String(ESP.getFreeHeap() / 1024) + " kb" + " / " + String(esp_get_minimum_free_heap_size() / 1024) + " kb");
+    }
   }
-
-  /*
-  Serial.print(millis() - screensaver);
-  Serial.print(" - ");
-  Serial.print(screensaverMode);
-  Serial.print(" - ");
-  Serial.println(TIMEOUT_TEMPORISATION);
-  */
 }
