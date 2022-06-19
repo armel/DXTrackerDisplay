@@ -36,14 +36,6 @@ void setup()
   // LCD
   display.fillScreen(display.color565(TFT_BACK.r, TFT_BACK.g, TFT_BACK.b));
 
-  // SPIFFS
-  if(!SPIFFS.begin())
-  {
-    Serial.println("SPIFFS Mount Failed");
-    Serial.println("SPIFFS Formating...");
-    SPIFFS.format(); // Format SPIFFS...
-  }
-
   // Title
   display.setFont(&rounded_led_board_730pt7b);
   display.setTextColor(TFT_WHITE, display.color565(TFT_BACK.r, TFT_BACK.g, TFT_BACK.b));
