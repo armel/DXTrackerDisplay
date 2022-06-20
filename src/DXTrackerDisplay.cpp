@@ -45,7 +45,7 @@ void setup()
   display.drawString("Version " + String(VERSION) + " by F4HWN", WIDTH / 2, 200);
 
   // QRCode
-  display.qrcode("https://github.com/armel/DXTracker", 312, 308, 400, 6);
+  display.qrcode("https://github.com/armel/DXTrackerDisplay", 312, 308, 400, 6);
 
   // We start by connecting to the WiFi network
   display.setTextPadding(WIDTH);
